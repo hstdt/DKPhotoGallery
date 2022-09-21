@@ -36,7 +36,7 @@ fileprivate class DKPhotoGalleryContentFooterViewContainer : UIView {
 
 ////////////////////////////////////////////////////////////
 
-internal protocol DKPhotoGalleryContentDataSource: class {
+internal protocol DKPhotoGalleryContentDataSource: AnyObject {
     
     func item(for index: Int) -> DKPhotoGalleryItem
         
@@ -52,7 +52,7 @@ internal protocol DKPhotoGalleryContentDataSource: class {
 
 }
 
-internal protocol DKPhotoGalleryContentDelegate: class {
+internal protocol DKPhotoGalleryContentDelegate: AnyObject {
     
     func contentVCCanScrollToPreviousOrNext(_ contentVC: DKPhotoGalleryContentVC) -> Bool
     
@@ -107,7 +107,7 @@ open class DKPhotoGalleryContentVC: UIViewController, UIScrollViewDelegate {
         self.automaticallyAdjustsScrollViewInsets = false
         self.view.backgroundColor = UIColor.clear
         
-        self.mainView.frame = CGRect(x: 0, y: 0, width: self.view.bounds.width, height: self.view.bounds.height)
+        self.mainView.frame = CGRect(x: 0, y: 0, width: UIApplication.shared.keyWindow!.bounds.size.width, height: UIApplication.shared.keyWindow!.bounds.size.height)
         self.mainView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.mainView.delegate = self
         
@@ -449,5 +449,15 @@ open class DKPhotoGalleryContentVC: UIViewController, UIScrollViewDelegate {
             }
         }
     }
-    
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: { context in
+            self.mainView.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+            self.mainView.set(totalCount: self.dataSource.numberOfItems())
+            self.updateVisibleViews(index: self.currentIndex, scrollToIndex: true, indexOnly: false)
+            self.updateFooterView()
+            self.resetScaleForVisibleVCs()
+            self.scrollToCurrentPage()
+        }, completion: nil)
+    }
 }

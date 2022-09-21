@@ -29,7 +29,7 @@ class DKPhotoGalleryScrollView: UIScrollView {
     }
     
     public func set(totalCount: Int) {
-        self.contentSize = CGSize(width: CGFloat(totalCount) * cellWidth() - 20,
+        self.contentSize = CGSize(width: CGFloat(totalCount) * cellWidth() - 20 + 420, // 420是魔法值。可以让ScrollView滚动到分屏时原本滚动不到的地方。小了都不行
                                   height: 0)
         self.views = Array<UIView?>(repeating: nil, count: totalCount)
     }
@@ -83,28 +83,28 @@ class DKPhotoGalleryScrollView: UIScrollView {
     }
     
     public func cellRect(for index: Int) -> CGRect {
-        return CGRect(origin: self.cellOrigin(for: index),
-                      size: CGSize(width: pageWidth(), height: pageHeight()))
+        CGRect(origin: self.cellOrigin(for: index),
+               size: CGSize(width: pageWidth(), height: pageHeight()))
     }
     
     public func cellOrigin(for index: Int) -> CGPoint {
-        return CGPoint(x: CGFloat(index) * cellWidth(), y: 0)
+        CGPoint(x: CGFloat(index) * cellWidth(), y: 0)
     }
     
     public func positionFromContentOffset() -> CGFloat {
-        return self.contentOffset.x / cellWidth()
+        self.contentOffset.x / cellWidth()
     }
     
     public func cellWidth() -> CGFloat {
-        return pageWidth() + 20
+        pageWidth() + 20
     }
     
     public func pageWidth() -> CGFloat {
-        return UIScreen.main.bounds.width
+        UIApplication.shared.keyWindow?.bounds.size.width ?? 0
     }
 
     public func pageHeight() -> CGFloat {
-        return UIScreen.main.bounds.height
+        UIApplication.shared.keyWindow?.bounds.size.height ?? 0
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
